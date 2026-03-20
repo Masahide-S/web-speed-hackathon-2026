@@ -115,9 +115,10 @@ const config = {
       inject: true,
       template: path.resolve(SRC_PATH, "./index.html"),
     }),
-    new BundleAnalyzerPlugin({ // ここを追記
-      analyzerMode: 'server',
-      openAnalyzer: true,
+// ✅ 修正後（デプロイ環境では無効化）
+    new BundleAnalyzerPlugin({
+      analyzerMode: process.env.NODE_ENV === 'production' ? 'disabled' : 'server',
+      openAnalyzer: false,
     }),
   ],
   resolve: {
