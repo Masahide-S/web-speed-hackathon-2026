@@ -155,17 +155,31 @@ const config = {
       url: false,
     },
   },
-optimization: {
+  optimization: {
     minimize: true,
     minimizer: [
       new TerserPlugin({
-        // 念のため、バイナリや辞書が混ざる可能性のあるファイルを除外
-        exclude: /ffmpeg|kuromoji|magick/,
+        exclude: /scripts\/(.*ffmpeg.*|.*kuromoji.*)\.js$/,
       }),
     ],
     splitChunks: {
-      chunks: 'all', 
-      minSize: 20000, // 小さすぎるファイルは分けない
+      chunks: 'all',
+      cacheGroups: {
+        // ★ ここを追加！ AIライブラリだけを「vendor-ai」という別ファイルに強制隔離します
+        aiLib: {
+          test: /[\\/]node_modules[\\/](@mlc-ai|web-llm)[\\/]/,
+          name: 'vendor-ai',
+          priority: 20, // 優先度を高くして、他のchunkに吸い込まれるのを防ぐ
+          enforce: true,
+        },
+        // その他、Reactなどの共通ライブラリをまとめる
+        defaultVendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          priority: -10,
+          reuseExistingChunk: true,
+        },
+      },
     },
     concatenateModules: true,
     usedExports: true,
