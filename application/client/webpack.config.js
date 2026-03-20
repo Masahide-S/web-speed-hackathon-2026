@@ -11,6 +11,7 @@ const PUBLIC_PATH = path.resolve(__dirname, "../public");
 const UPLOAD_PATH = path.resolve(__dirname, "../upload");
 const DIST_PATH = path.resolve(__dirname, "../dist");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const TerserPlugin = require("terser-webpack-plugin");
 
 /** @type {import('webpack').Configuration} */
 const config = {
@@ -81,8 +82,9 @@ const config = {
     ],
   },
   output: {
+    // chunkFormat: false, ← これを削除！
+    chunkLoadingGlobal: "webpackChunk_web_speed_hackathon", // 追加：他のスクリプトと衝突しないように
     chunkFilename: "scripts/chunk-[contenthash].js",
-    chunkFormat: false,
     filename: "scripts/[name].js",
     path: DIST_PATH,
     publicPath: "auto",
@@ -153,13 +155,22 @@ const config = {
       url: false,
     },
   },
-  optimization: {
-      minimize: false,             // コードを圧縮する
-      splitChunks: false, // 共通ライブラリを別ファイルに分ける
-      concatenateModules: true,   // モジュールを連結してサイズ削減
-      usedExports: true,          // 未使用コードの抽出
-      providedExports: true,
-      sideEffects: true,          // 不要なインポートの削除
+optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        // 念のため、バイナリや辞書が混ざる可能性のあるファイルを除外
+        exclude: /ffmpeg|kuromoji|magick/,
+      }),
+    ],
+    splitChunks: {
+      chunks: 'all', 
+      minSize: 20000, // 小さすぎるファイルは分けない
+    },
+    concatenateModules: true,
+    usedExports: true,
+    providedExports: true,
+    sideEffects: true,
   },
   cache: false,
   ignoreWarnings: [
