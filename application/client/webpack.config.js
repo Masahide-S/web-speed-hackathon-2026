@@ -164,11 +164,6 @@ const config = {
       chunks: 'all',
       maxInitialRequests: 20, // 同時に読み込めるファイル数の上限を増やす
       cacheGroups: {
-        reactVendor: {
-        test: /[\\/]node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/,
-        name: 'vendor-react',
-        priority: 25,
-        enforce: true,
         // AIライブラリの隔離
         ai: {
           test: /[\\/]node_modules[\\/](@mlc-ai|web-llm)[\\/]/,
@@ -184,6 +179,12 @@ const config = {
             return `vendor-${packageName.replace('@', '')}`;
           },
           priority: 30,
+          enforce: true,
+        },
+        reactVendor: {
+          test: /[\\/]node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/,
+          name: 'vendor-react',
+          priority: 25,
           enforce: true,
         },
       },
