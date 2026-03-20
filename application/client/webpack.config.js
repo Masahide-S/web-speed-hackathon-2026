@@ -26,7 +26,7 @@ const config = {
     ],
     static: [PUBLIC_PATH, UPLOAD_PATH],
   },
-  devtool: "inline-source-map",
+  devtool: false,
   entry: {
     main: [
       "core-js",
@@ -37,7 +37,7 @@ const config = {
       path.resolve(SRC_PATH, "./index.tsx"),
     ],
   },
-  mode: "none",
+  mode: "production",
   module: {
     rules: [
       {
@@ -56,6 +56,14 @@ const config = {
       {
         resourceQuery: /binary/,
         type: "asset/bytes",
+      },
+      {
+      test: /\.wasm$/,
+      type: "asset/resource", // JSの中に埋め込まず、別のファイルとして出力する
+      },
+      {
+        test: /\.dic\.json$/, // kuromojiの辞書などの巨大JSON用
+        type: "asset/resource",
       },
     ],
   },
@@ -78,7 +86,7 @@ const config = {
       BUILD_DATE: new Date().toISOString(),
       // Heroku では SOURCE_VERSION 環境変数から commit hash を参照できます
       COMMIT_HASH: process.env.SOURCE_VERSION || "",
-      NODE_ENV: "development",
+      NODE_ENV: "production",
     }),
     new MiniCssExtractPlugin({
       filename: "styles/[name].css",
@@ -133,12 +141,12 @@ const config = {
     },
   },
   optimization: {
-    minimize: false,
-    splitChunks: false,
-    concatenateModules: false,
-    usedExports: false,
-    providedExports: false,
-    sideEffects: false,
+      minimize: false,             // コードを圧縮する
+      splitChunks: { chunks: 'all' }, // 共通ライブラリを別ファイルに分ける
+      concatenateModules: true,   // モジュールを連結してサイズ削減
+      usedExports: true,          // 未使用コードの抽出
+      providedExports: true,
+      sideEffects: true,          // 不要なインポートの削除
   },
   cache: false,
   ignoreWarnings: [
