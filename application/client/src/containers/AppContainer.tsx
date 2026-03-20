@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useId, useState, lazy, Suspense } from "react";
-import { HelmetProvider } from "react-helmet";
+// Helmet を追加でインポート
+import { Helmet, HelmetProvider } from "react-helmet";
 import { Route, Routes, useLocation, useNavigate } from "react-router";
 
 import { AppPage } from "@web-speed-hackathon-2026/client/src/components/application/AppPage";
 import { AuthModalContainer } from "@web-speed-hackathon-2026/client/src/containers/AuthModalContainer";
 import { fetchJSON, sendJSON } from "@web-speed-hackathon-2026/client/src/utils/fetchers";
 
-// コンテナ類：これらは lazy のままでOK（初期表示の JS 量を減らすため）
+// コンテナ類（変更なし）
 const TimelineContainer = lazy(() => import("@web-speed-hackathon-2026/client/src/containers/TimelineContainer").then(m => ({ default: m.TimelineContainer })));
 const DirectMessageListContainer = lazy(() => import("@web-speed-hackathon-2026/client/src/containers/DirectMessageListContainer").then(m => ({ default: m.DirectMessageListContainer })));
 const DirectMessageContainer = lazy(() => import("@web-speed-hackathon-2026/client/src/containers/DirectMessageContainer").then(m => ({ default: m.DirectMessageContainer })));
@@ -44,19 +45,27 @@ export const AppContainer = () => {
   const authModalId = useId();
   const newPostModalId = useId();
 
-  if (isLoadingActiveUser) {
-    return <div style={{ padding: "20px" }}>読み込み中...</div>;
-  }
+  // if (isLoadingActiveUser) {
+  //   return <div style={{ padding: "20px" }}>読み込み中...</div>;
+  // }
 
   return (
     <HelmetProvider>
+      {/* 🚀 SEO と Accessibility のための設定を追加 */}
+      <Helmet>
+        <html lang="ja" />
+        <title>CaX - 爆速なSNS体験を</title>
+        <meta name="description" content="CaXは、Web Speed Hackathon 2026のために最適化された、次世代のSNSプラットフォームです。" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Helmet>
+
       <AppPage
         activeUser={activeUser}
         authModalId={authModalId}
         newPostModalId={newPostModalId}
         onLogout={handleLogout}
       >
-        <Suspense fallback={<div style={{ padding: "20px" }}>読み込み中...</div>}>
+        <Suspense fallback={<div style={{ padding: "20px" }}>コンテンツ読み込み中...</div>}>
           <Routes>
             <Route element={<TimelineContainer />} path="/" />
             <Route element={<DirectMessageListContainer activeUser={activeUser} authModalId={authModalId} />} path="/dm" />
@@ -72,6 +81,7 @@ export const AppContainer = () => {
       </AppPage>
 
       <AuthModalContainer id={authModalId} onUpdateActiveUser={setActiveUser} />
+      
       {activeUser && (
         <Suspense fallback={null}>
           <NewPostModalContainer id={newPostModalId} />
