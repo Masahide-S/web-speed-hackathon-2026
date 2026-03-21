@@ -17,8 +17,8 @@ const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
 export const TimelineItem = ({ post, index }: Props) => {
   const navigate = useNavigate();
 
-  // Above-the-fold判定: 最初の3個は即座に読み込む（LCP対策）
-  const isAboveFold = index < 3;
+  // LCP対策: 最初の1個だけ即座に読み込む（リソース集中戦略）
+  const isAboveFold = index === 0;
 
   // クリック判定もシンプルに（余計なループを回さない）
   const handleClick = useCallback<MouseEventHandler>((ev) => {
@@ -31,14 +31,13 @@ export const TimelineItem = ({ post, index }: Props) => {
   const displayDate = useMemo(() => dateFormatter.format(new Date(post.createdAt)), [post.createdAt]);
 
   return (
-    <article 
-      className="hover:bg-cax-surface-subtle px-1 sm:px-4 cursor-pointer" 
+    <article
+      className="hover:bg-cax-surface-subtle px-1 sm:px-4 cursor-pointer"
       onClick={handleClick}
-      // content-visibilityは維持。これが最高の武器です。
-      // TimelineItem.tsx 内の article の style
-      style={{ 
-          contentVisibility: 'auto', 
-          containIntrinsicSize: '0 350px' // ★ 画像ありを見越して高めに確保（CLS対策）
+      // LCP要素を含む最初のアイテムではcontent-visibilityを無効化
+      style={index === 0 ? undefined : {
+          contentVisibility: 'auto',
+          containIntrinsicSize: '0 350px'
       }}
     >
       <div className="border-cax-border flex border-b px-2 pt-2 pb-4 sm:px-4">

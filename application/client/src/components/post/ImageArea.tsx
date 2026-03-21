@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { MouseEvent, useCallback, useId, useState } from "react";
 
-import { AspectRatioBox } from "@web-speed-hackathon-2026/client/src/components/foundation/AspectRatioBox";
 import { SimpleImage } from "@web-speed-hackathon-2026/client/src/components/foundation/SimpleImage";
 import { Button } from "@web-speed-hackathon-2026/client/src/components/foundation/Button";
 import { Modal } from "@web-speed-hackathon-2026/client/src/components/modal/Modal";
@@ -27,9 +26,11 @@ export const ImageArea = ({ images, priority = false }: Props) => {
 
   return (
     <>
-      <AspectRatioBox aspectHeight={9} aspectWidth={16}>
+      <div className="w-full" style={{ aspectRatio: "16 / 9" }}>
         <div className="border-cax-border grid h-full w-full grid-cols-2 grid-rows-2 gap-1 overflow-hidden rounded-lg border">
           {images.map((image, idx) => {
+            // 最初の画像だけ最高優先度（LCP対策）
+            const isPrimaryImage = idx === 0 && priority;
             return (
               <div
                 key={image.id}
@@ -43,7 +44,7 @@ export const ImageArea = ({ images, priority = false }: Props) => {
                 <SimpleImage
                   src={getImagePath(image.id)}
                   alt={image.alt ?? ""}
-                  priority={priority}
+                  priority={isPrimaryImage}
                 />
                 <button
                   className="border-cax-border bg-cax-surface-raised/90 text-cax-text-muted hover:bg-cax-surface absolute right-1 bottom-1 rounded-full border px-2 py-1 text-center text-xs"
@@ -58,7 +59,7 @@ export const ImageArea = ({ images, priority = false }: Props) => {
             );
           })}
         </div>
-      </AspectRatioBox>
+      </div>
 
       <Modal id={dialogId} closedby="any" onClick={handleDialogClick}>
         <div className="grid gap-y-6">
