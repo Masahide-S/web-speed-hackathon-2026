@@ -26,8 +26,8 @@ export const ImageArea = ({ images, priority = false }: Props) => {
 
   return (
     <>
-      <div className="w-full" style={{ aspectRatio: "16 / 9" }}>
-        <div className="border-cax-border grid h-full w-full grid-cols-2 grid-rows-2 gap-1 overflow-hidden rounded-lg border">
+      <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+        <div className="border-cax-border absolute inset-0 grid h-full w-full grid-cols-2 grid-rows-2 gap-1 overflow-hidden rounded-lg border">
           {images.map((image, idx) => {
             // 最初の画像だけ最高優先度（LCP対策）
             const isPrimaryImage = idx === 0 && priority;

@@ -222,7 +222,6 @@ export const ChatInput = ({ isStreaming, onSendMessage }: Props) => {
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="メッセージを入力..."
-            aria-label="メッセージを入力"
             lang="ja"
             rows={1}
             value={inputValue}
