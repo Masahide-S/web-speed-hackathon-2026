@@ -1,4 +1,5 @@
 import bodyParser from "body-parser";
+import compression from "compression";
 import Express from "express";
 
 import { apiRouter } from "@web-speed-hackathon-2026/server/src/routes/api";
@@ -8,6 +9,21 @@ import { sessionMiddleware } from "@web-speed-hackathon-2026/server/src/session"
 export const app = Express();
 
 app.set("trust proxy", true);
+
+// 圧縮ミドルウェアを最初に適用（全レスポンスを圧縮）
+app.use(
+  compression({
+    level: 6, // 圧縮レベル（0-9、デフォルトは6）バランスが良い
+    threshold: 1024, // 1KB以上のレスポンスのみ圧縮（小さいファイルは圧縮しない）
+    filter: (req, res) => {
+      // 圧縮すべきかどうかを判断
+      if (req.headers["x-no-compression"]) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+  }),
+);
 
 app.use(sessionMiddleware);
 app.use(bodyParser.json());
